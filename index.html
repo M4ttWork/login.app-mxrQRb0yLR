@@ -51,7 +51,7 @@
       e.preventDefault(); // zatrzymaj domyślne działanie
 
       const login = loginInput.value.trim().toLowerCase();
-      const email = `${login}@mobilekj.com`;
+      const email = `${login}mobilekj.local`;
       const password = passwordInput.value;
 
       auth.signInWithEmailAndPassword(email, password)
@@ -68,7 +68,7 @@
     // 🧾 Rejestracja
     document.getElementById("register-btn").addEventListener("click", () => {
       const login = loginInput.value.trim().toLowerCase();
-      const email = `${login}@mojaapka.local`;
+      const email = `${login}@mobilekj.local`;
       const password = passwordInput.value;
 
       auth.createUserWithEmailAndPassword(email, password)
