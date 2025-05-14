@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Logowanie / Rejestracja</title>
-  
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase SDK (compat wersja) -->
+  <!-- Firebase SDK (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 </head>
@@ -48,10 +48,10 @@
 
     // 🔐 Logowanie
     document.getElementById("auth-form").addEventListener("submit", (e) => {
-      e.preventDefault(); // zatrzymaj domyślne działanie
+      e.preventDefault();
 
       const login = loginInput.value.trim().toLowerCase();
-      const email = `${login}mobilekj.local`;
+      const email = login.includes("@") ? login : `${login}@mobilekj.local`;
       const password = passwordInput.value;
 
       auth.signInWithEmailAndPassword(email, password)
@@ -68,7 +68,7 @@
     // 🧾 Rejestracja
     document.getElementById("register-btn").addEventListener("click", () => {
       const login = loginInput.value.trim().toLowerCase();
-      const email = `${login}@mobilekj.local`;
+      const email = login.includes("@") ? login : `${login}@mobilekj.local`;
       const password = passwordInput.value;
 
       auth.createUserWithEmailAndPassword(email, password)
