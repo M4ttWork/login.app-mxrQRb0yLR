@@ -24,15 +24,17 @@
   </div>
 
   <script>
+    // ✅ Twoja konfiguracja Firebase
     const firebaseConfig = {
-  apiKey: "AIzaSyAzCT2EbFOjz9pwZA0wmgUvDiWw5lh-TAs",
-  authDomain: "login-app-c2632.firebaseapp.com",
-  projectId: "login-app-c2632",
-  storageBucket: "login-app-c2632.firebasestorage.app",
-  messagingSenderId: "16046816432",
-  appId: "1:16046816432:web:bb58c03f1404b1ca46cf75"
-};
+      apiKey: "AIzaSyAzCT2EbFOjz9pwZA0wmgUvDiWw5lh-TAs",
+      authDomain: "login-app-c2632.firebaseapp.com",
+      projectId: "login-app-c2632",
+      storageBucket: "login-app-c2632.firebasestorage.app",
+      messagingSenderId: "16046816432",
+      appId: "1:16046816432:web:bb58c03f1404b1ca46cf75"
+    };
 
+    // 🔥 Inicjalizacja Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
@@ -49,10 +51,11 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
           status.textContent = "✅ Zalogowano!";
-          window.location.href = "https://www.onet.pl";
+          setTimeout(() => window.location.href = "https://www.onet.pl", 1000);
         })
         .catch(error => {
           status.textContent = "❌ Błąd logowania: " + error.message;
+          console.error(error);
         });
     });
 
@@ -64,10 +67,11 @@
       auth.createUserWithEmailAndPassword(email, password)
         .then(() => {
           status.textContent = "✅ Konto utworzone!";
-          window.location.href = "https://www.onet.pl";
+          setTimeout(() => window.location.href = "https://www.onet.pl", 1000);
         })
         .catch(error => {
           status.textContent = "❌ Błąd rejestracji: " + error.message;
+          console.error(error);
         });
     });
   </script>
