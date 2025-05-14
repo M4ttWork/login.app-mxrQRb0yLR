@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Logowanie / Rejestracja</title>
+  <title>Logowanie</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,14 +14,13 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
   <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
-    <h2 class="text-2xl font-bold mb-6 text-center">Witaj 👋</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center">Zaloguj się</h2>
     
-    <form id="auth-form" class="space-y-4">
+    <form id="login-form" class="space-y-4">
       <input type="text" id="login" placeholder="Login (np. jan.kowalski)" required class="w-full px-4 py-2 border rounded-xl"/>
       <input type="password" id="password" placeholder="Hasło" required class="w-full px-4 py-2 border rounded-xl"/>
 
-      <button id="login-btn" type="submit" class="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600">Zaloguj się</button>
-      <button id="register-btn" type="button" class="w-full bg-green-500 text-white py-2 rounded-xl hover:bg-green-600">Zarejestruj się</button>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600">Zaloguj się</button>
     </form>
 
     <p id="status" class="text-center mt-4 text-sm text-red-600"></p>
@@ -46,12 +45,17 @@
     const passwordInput = document.getElementById("password");
     const status = document.getElementById("status");
 
-    // 🔐 Logowanie
-    document.getElementById("auth-form").addEventListener("submit", (e) => {
+    // 🔐 Obsługa logowania
+    document.getElementById("login-form").addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const login = loginInput.value.trim().toLowerCase();
-      const email = login.includes("@") ? login : `${login}@mobilekj.local`;
+      const rawLogin = loginInput.value.trim().toLowerCase();
+      if (!rawLogin) {
+        status.textContent = "❌ Login jest wymagany!";
+        return;
+      }
+
+      const email = rawLogin.includes("@") ? rawLogin : `${rawLogin}@mobilekj.local`;
       const password = passwordInput.value;
 
       auth.signInWithEmailAndPassword(email, password)
@@ -61,23 +65,6 @@
         })
         .catch(error => {
           status.textContent = "❌ Błąd logowania: " + error.message;
-          console.error(error);
-        });
-    });
-
-    // 🧾 Rejestracja
-    document.getElementById("register-btn").addEventListener("click", () => {
-      const login = loginInput.value.trim().toLowerCase();
-      const email = login.includes("@") ? login : `${login}@mobilekj.local`;
-      const password = passwordInput.value;
-
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          status.textContent = "✅ Konto utworzone!";
-          setTimeout(() => window.location.href = "https://www.onet.pl", 1000);
-        })
-        .catch(error => {
-          status.textContent = "❌ Błąd rejestracji: " + error.message;
           console.error(error);
         });
     });
