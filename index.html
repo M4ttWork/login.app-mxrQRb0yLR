@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Logowanie / Rejestracja</title>
   
-  <!-- Tailwind CSS (dla stylów) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase SDK kompatybilny z firebase.* -->
+  <!-- Firebase SDK (compat wersja) -->
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 </head>
@@ -17,7 +17,7 @@
     <h2 class="text-2xl font-bold mb-6 text-center">Witaj 👋</h2>
     
     <form id="auth-form" class="space-y-4">
-      <input type="email" id="email" placeholder="Email" required class="w-full px-4 py-2 border rounded-xl"/>
+      <input type="text" id="login" placeholder="Login (np. jan.kowalski)" required class="w-full px-4 py-2 border rounded-xl"/>
       <input type="password" id="password" placeholder="Hasło" required class="w-full px-4 py-2 border rounded-xl"/>
 
       <button id="login-btn" type="submit" class="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600">Zaloguj się</button>
@@ -28,7 +28,7 @@
   </div>
 
   <script>
-    // ✅ Twoja konfiguracja Firebase
+    // 🔧 Konfiguracja Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAzCT2EbFOjz9pwZA0wmgUvDiWw5lh-TAs",
       authDomain: "login-app-c2632.firebaseapp.com",
@@ -42,15 +42,16 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    const emailInput = document.getElementById("email");
+    const loginInput = document.getElementById("login");
     const passwordInput = document.getElementById("password");
     const status = document.getElementById("status");
 
     // 🔐 Logowanie
     document.getElementById("auth-form").addEventListener("submit", (e) => {
-      e.preventDefault(); // zapobiegaj odświeżeniu
+      e.preventDefault(); // zatrzymaj domyślne działanie
 
-      const email = emailInput.value;
+      const login = loginInput.value.trim().toLowerCase();
+      const email = `${login}@mobilekj.com`;
       const password = passwordInput.value;
 
       auth.signInWithEmailAndPassword(email, password)
@@ -66,7 +67,8 @@
 
     // 🧾 Rejestracja
     document.getElementById("register-btn").addEventListener("click", () => {
-      const email = emailInput.value;
+      const login = loginInput.value.trim().toLowerCase();
+      const email = `${login}@mojaapka.local`;
       const password = passwordInput.value;
 
       auth.createUserWithEmailAndPassword(email, password)
