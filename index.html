@@ -61,7 +61,7 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
           status.textContent = "✅ Zalogowano!";
-          setTimeout(() => window.location.href = "document.html", 1000);
+          setTimeout(() => window.location.href = "/document.html", 1000);
         })
         .catch(error => {
           status.textContent = "❌ Błąd logowania: " + error.message;
