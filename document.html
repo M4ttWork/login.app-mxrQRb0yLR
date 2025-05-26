@@ -92,7 +92,7 @@
         const pdfBytes = await pdfDoc.save();
 
         // 🔁 Wyślij do backendu Render
-        const backendUrl = "https://login-app-mxrqrb0ylr.onrender.com"; // ⬅️ Uzupełnij adresem z Render
+        const backendUrl = "https://login-app-mxrqrb0ylr.onrender.com/upload"; // ⬅️ Uzupełnij adresem z Render
         const response = await fetch(backendUrl, {
           method: "POST",
           headers: {
