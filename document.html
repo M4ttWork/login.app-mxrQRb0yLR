@@ -9,7 +9,6 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
 
   <!-- SignaturePad + pdf-lib -->
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
@@ -30,19 +29,16 @@
   <p id="status" class="text-sm text-green-600 mt-2"></p>
 
   <script>
-    // 🔧 Firebase config
+    // 🔧 Konfiguracja Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAzCT2EbFOjz9pwZA0wmgUvDiWw5lh-TAs",
       authDomain: "login-app-c2632.firebaseapp.com",
       projectId: "login-app-c2632",
-      storageBucket: "login-app-c2632.appspot.com",
-      messagingSenderId: "16046816432",
       appId: "1:16046816432:web:bb58c03f1404b1ca46cf75"
     };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const storage = firebase.storage();
 
     const canvas = document.getElementById('signature');
     const signaturePad = new SignaturePad(canvas);
@@ -69,11 +65,10 @@
         // 📄 Pobierz PDF
         const pdfUrl = "regulamin.pdf";
         const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
-
         const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
         const page = pdfDoc.getPages()[pdfDoc.getPageCount() - 1];
 
-        // 📸 Dodaj podpis jako obraz
+        // 📸 Podpis jako PNG
         const pngDataUrl = signaturePad.toDataURL();
         const pngImageBytes = await fetch(pngDataUrl).then(res => res.arrayBuffer());
         const pngImage = await pdfDoc.embedPng(pngImageBytes);
@@ -86,7 +81,7 @@
           height: 80
         });
 
-        // 🧾 Dodaj UID i datę
+        // 🧾 UID + data
         const date = new Date().toLocaleString("pl-PL");
         page.drawText(`UID: ${user.uid}\nData: ${date}`, {
           x: 50,
@@ -96,11 +91,23 @@
 
         const pdfBytes = await pdfDoc.save();
 
-        // ☁️ Zapis do Firebase Storage
-        const fileRef = storage.ref().child(`signed-documents/${user.uid}/regulamin_signed_${Date.now()}.pdf`);
-        await fileRef.put(new Blob([pdfBytes], { type: 'application/pdf' }));
+        // 🔁 Wyślij do backendu Render
+        const backendUrl = "https://login-app-mxrqrb0ylr.onrender.com/upload"; // ⬅️ Uzupełnij adresem z Render
+        const response = await fetch(backendUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/pdf",
+            "X-User-ID": user.uid
+          },
+          body: new Blob([pdfBytes], { type: 'application/pdf' })
+        });
 
-        status.textContent = "✅ Podpisany dokument zapisany!";
+        if (response.ok) {
+          status.textContent = "✅ Podpisany dokument został wysłany!";
+        } else {
+          throw new Error("Nie udało się wysłać pliku.");
+        }
+
       } catch (error) {
         console.error(error);
         status.textContent = "❌ Błąd: " + error.message;
