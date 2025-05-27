@@ -6,7 +6,7 @@ const app = express();
 
 // --- 1) Konfiguracja CORS – obsługa preflight i niestandardowych nagłówków
 const corsOptions = {
-  origin: "https://login-app-mxrqrb0ylr.onrender.com",  // zmień na domenę frontendu
+  origin: "https://m4ttwork.github.io",  // ✅ zmieniono na domenę GitHub Pages
   methods: ["POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "X-User-ID", "X-Full-Name"]
 };
