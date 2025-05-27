@@ -16,7 +16,7 @@
 </head>
 <body class="bg-gray-50 p-4 max-w-3xl mx-auto">
 
-  <h1 class="text-2xl font-bold mb-4">📄 Dokument do zapoznania ver 4.7</h1>
+  <h1 class="text-2xl font-bold mb-4">📄 Dokument do zapoznania ver 4.8</h1>
 
   <iframe src="regulamin.pdf" class="w-full h-96 border mb-4"></iframe>
 
@@ -98,21 +98,19 @@
         const pngImage = await pdfDoc.embedPng(pngImageBytes);
 
         const { width, height } = page.getSize();
-        const margin = 28.35; // 1 cm
+        const margin = 28.35;
         const yPosition = margin + 5;
 
         const date = new Date().toLocaleDateString("pl-PL");
         const text = `Data: ${date}  ${fullName}`;
         const fontSize = width < 400 ? 10 : 12;
 
-        // Tekst po lewej
         page.drawText(text, {
           x: margin,
           y: yPosition,
           size: fontSize
         });
 
-        // Podpis po prawej
         const signatureWidth = width * 0.2;
         const signatureHeight = signatureWidth * 0.33;
         const signatureX = width - signatureWidth - margin;
@@ -131,7 +129,8 @@
           method: "POST",
           headers: {
             "Content-Type": "application/pdf",
-            "X-User-ID": user.uid
+            "X-User-ID": user.uid,
+            "X-Full-Name": fullName // ← DODANE
           },
           body: new Blob([pdfBytes], { type: 'application/pdf' })
         });
