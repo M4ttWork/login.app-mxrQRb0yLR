@@ -48,10 +48,23 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+    // 🔒 Automatyczne uzupełnienie imienia i nazwiska po zalogowaniu
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      const loginName = user.email.split("@")[0]; // np. jan.kowalski
+      const fullNameInput = document.getElementById("fullName");
+      fullNameInput.value = loginName;
+      fullNameInput.readOnly = true;
+      fullNameInput.classList.add("bg-gray-100", "cursor-not-allowed", "opacity-70");
+    });
+
     const canvas = document.getElementById('signature');
     const signaturePad = new SignaturePad(canvas);
 
-    // ← Dodano: usunięcie fokusu z pola tekstowego po kliknięciu w canvas
     canvas.addEventListener("pointerdown", () => {
       document.getElementById("fullName").blur();
     });
@@ -143,7 +156,6 @@
         if (response.ok) {
           status.textContent = "✅ Podpisany dokument został wysłany!";
           signaturePad.clear();
-          document.getElementById("fullName").value = "";
         } else {
           throw new Error("Nie udało się wysłać pliku.");
         }
