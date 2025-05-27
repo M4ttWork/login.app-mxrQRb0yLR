@@ -16,7 +16,7 @@
 </head>
 <body class="bg-gray-50 p-4 max-w-3xl mx-auto">
 
-  <h1 class="text-2xl font-bold mb-4">📄 Dokument do zapoznania ver 2.0</h1>
+  <h1 class="text-2xl font-bold mb-4">📄 Dokument do zapoznania ver 3.0</h1>
 
   <iframe src="regulamin.pdf" class="w-full h-96 border mb-4"></iframe>
 
@@ -99,25 +99,27 @@
 
         const { width, height } = page.getSize();
         const margin = 28.35; // 1 cm
+        const yPosition = margin + 5;
 
         const date = new Date().toLocaleDateString("pl-PL");
-        const text = `Data: ${date}     Imie i nazwisko: ${fullName}`;
-        const fontSize = 12;
-        const textX = margin;
-        const textY = margin + 85;
+        const text = `Data: ${date}     Imię i nazwisko: ${fullName}`;
+        const fontSize = width < 400 ? 10 : 12;
 
+        // Tekst po lewej
         page.drawText(text, {
-          x: textX,
-          y: textY,
+          x: margin,
+          y: yPosition,
           size: fontSize
         });
 
-        const signatureWidth = 200;
-        const signatureHeight = 80;
+        // Podpis po prawej
+        const signatureWidth = width * 0.2;
+        const signatureHeight = signatureWidth * 0.33;
+        const signatureX = width - signatureWidth - margin;
 
         page.drawImage(pngImage, {
-          x: width - signatureWidth - margin,
-          y: margin,
+          x: signatureX,
+          y: yPosition - 5,
           width: signatureWidth,
           height: signatureHeight
         });
