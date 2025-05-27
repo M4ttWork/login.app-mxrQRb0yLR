@@ -8,8 +8,11 @@ app.use(express.raw({ type: "application/pdf", limit: "10mb" }));
 
 app.post("/upload", async (req, res) => {
   const uid = req.header("X-User-ID") || "unknown";
+  const fullName = req.header("X-Full-Name") || "Nieznane Imię i Nazwisko";
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const fileName = `regulamin_signed_${uid}_${timestamp}.pdf`;
+
+  const sanitizedFullName = fullName.replace(/[^a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9\s]/g, "").replace(/\s+/g, "_");
+  const fileName = `${sanitizedFullName}_${timestamp}.pdf`;
 
   try {
     const transporter = nodemailer.createTransport({
@@ -25,8 +28,8 @@ app.post("/upload", async (req, res) => {
     const mailOptions = {
       from: `"PDF Uploader" <${process.env.SMTP_USER}>`,
       to: process.env.RECIPIENT_EMAIL,
-      subject: `Nowy regulamin od użytkownika ${uid}`,
-      text: `W załączniku znajduje się podpisany regulamin od użytkownika ${uid}.`,
+      subject: `Potwierdzenie Alertu od: ${fullName}`,
+      text: `W załączniku znajduje się potwierdzenie alertu przez: ${fullName}.`,
       attachments: [
         {
           filename: fileName,
