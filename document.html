@@ -16,7 +16,7 @@
 </head>
 <body class="bg-gray-50 p-4 max-w-3xl mx-auto">
 
-  <h1 class="text-2xl font-bold mb-4">📄 Dokument do zapoznania</h1>
+  <h1 class="text-2xl font-bold mb-4">📄 Dokument do zapoznania ver 1.0</h1>
 
   <iframe src="regulamin.pdf" class="w-full h-96 border mb-4"></iframe>
 
@@ -27,7 +27,7 @@
 
   <h2 class="text-xl mb-2">✍️ Podpisz się poniżej:</h2>
   <div class="w-full border bg-white mb-2 rounded-lg overflow-hidden">
-    <canvas id="signature" class="w-full" style="height:150px;"></canvas>
+    <canvas id="signature" style="width: 100%; height: 150px;"></canvas>
   </div>
 
   <div class="mb-4">
@@ -38,7 +38,6 @@
   <p id="status" class="text-sm text-green-600 mt-2"></p>
 
   <script>
-    // 🔧 Konfiguracja Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAzCT2EbFOjz9pwZA0wmgUvDiWw5lh-TAs",
       authDomain: "login-app-c2632.firebaseapp.com",
@@ -52,16 +51,16 @@
     const canvas = document.getElementById('signature');
     const signaturePad = new SignaturePad(canvas);
 
- function resizeCanvas() {
-  const ratio = Math.max(window.devicePixelRatio || 1, 1);
-  canvas.width = canvas.offsetWidth * ratio;
-  canvas.height = 150 * ratio;
-  canvas.getContext("2d").scale(ratio, ratio);
-  signaturePad.clear();
-}
+    function resizeCanvas() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = 150 * ratio;
+      canvas.getContext("2d").scale(ratio, ratio);
+      signaturePad.clear();
+    }
 
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
     document.getElementById('clear').addEventListener('click', () => signaturePad.clear());
 
@@ -101,27 +100,26 @@ resizeCanvas();
         const { width, height } = page.getSize();
         const margin = 28.35; // 1 cm
 
-        // 📌 Podpis w prawym dolnym rogu
+        const date = new Date().toLocaleDateString("pl-PL");
+        const text = `Data: ${date}     Imię i nazwisko: ${fullName}`;
+        const fontSize = 12;
+        const textX = margin;
+        const textY = margin + 85;
+
+        page.drawText(text, {
+          x: textX,
+          y: textY,
+          size: fontSize
+        });
+
+        const signatureWidth = 200;
+        const signatureHeight = 80;
+
         page.drawImage(pngImage, {
-          x: width - 200 - margin,
+          x: width - signatureWidth - margin,
           y: margin,
-          width: 200,
-          height: 80
-        });
-
-        // 🕓 Data i UID nad podpisem
-        const date = new Date().toLocaleString("pl-PL");
-        page.drawText(`UID: ${user.uid}\nData: ${date}`, {
-          x: width - 200 - margin,
-          y: margin + 85,
-          size: 10
-        });
-
-        // 🧾 Imię i nazwisko po lewej stronie podpisu
-        page.drawText(`Podpis: ${fullName}`, {
-          x: margin,
-          y: margin + 30,
-          size: 12
+          width: signatureWidth,
+          height: signatureHeight
         });
 
         const pdfBytes = await pdfDoc.save();
