@@ -14,13 +14,22 @@
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
-<body class="bg-gray-50 p-4">
+<body class="bg-gray-50 p-4 max-w-3xl mx-auto">
+
   <h1 class="text-2xl font-bold mb-4">📄 Dokument do zapoznania</h1>
 
   <iframe src="regulamin.pdf" class="w-full h-96 border mb-4"></iframe>
 
+  <div class="mb-4">
+    <label for="fullName" class="block mb-1 font-medium">🧾 Podaj Imię i Nazwisko:</label>
+    <input type="text" id="fullName" class="w-full p-2 border rounded" placeholder="Jan Kowalski" />
+  </div>
+
   <h2 class="text-xl mb-2">✍️ Podpisz się poniżej:</h2>
-  <canvas id="signature" class="border bg-white mb-2" width="400" height="150"></canvas>
+  <div class="w-full border bg-white mb-2 rounded-lg overflow-hidden">
+    <canvas id="signature" class="w-full" style="height:150px;"></canvas>
+  </div>
+
   <div class="mb-4">
     <button id="clear" class="bg-gray-300 px-4 py-1 rounded mr-2">Wyczyść</button>
     <button id="confirm" class="bg-blue-500 text-white px-4 py-1 rounded">Potwierdź zapoznanie</button>
@@ -42,6 +51,18 @@
 
     const canvas = document.getElementById('signature');
     const signaturePad = new SignaturePad(canvas);
+
+ function resizeCanvas() {
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  canvas.width = canvas.offsetWidth * ratio;
+  canvas.height = 150 * ratio;
+  canvas.getContext("2d").scale(ratio, ratio);
+  signaturePad.clear();
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
     document.getElementById('clear').addEventListener('click', () => signaturePad.clear());
 
     const status = document.getElementById("status");
@@ -50,6 +71,12 @@
     confirmBtn.addEventListener('click', async () => {
       if (signaturePad.isEmpty()) {
         status.textContent = "❌ Proszę złożyć podpis.";
+        return;
+      }
+
+      const fullName = document.getElementById("fullName").value.trim();
+      if (!fullName) {
+        status.textContent = "❌ Proszę wpisać imię i nazwisko.";
         return;
       }
 
@@ -62,37 +89,44 @@
       }
 
       try {
-        // 📄 Pobierz PDF
         const pdfUrl = "regulamin.pdf";
         const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
         const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
         const page = pdfDoc.getPages()[pdfDoc.getPageCount() - 1];
 
-        // 📸 Podpis jako PNG
         const pngDataUrl = signaturePad.toDataURL();
         const pngImageBytes = await fetch(pngDataUrl).then(res => res.arrayBuffer());
         const pngImage = await pdfDoc.embedPng(pngImageBytes);
 
         const { width, height } = page.getSize();
+        const margin = 28.35; // 1 cm
+
+        // 📌 Podpis w prawym dolnym rogu
         page.drawImage(pngImage, {
-          x: width / 2 - 100,
-          y: 50,
+          x: width - 200 - margin,
+          y: margin,
           width: 200,
           height: 80
         });
 
-        // 🧾 UID + data
+        // 🕓 Data i UID nad podpisem
         const date = new Date().toLocaleString("pl-PL");
         page.drawText(`UID: ${user.uid}\nData: ${date}`, {
-          x: 50,
-          y: 50,
+          x: width - 200 - margin,
+          y: margin + 85,
           size: 10
+        });
+
+        // 🧾 Imię i nazwisko po lewej stronie podpisu
+        page.drawText(`Podpis: ${fullName}`, {
+          x: margin,
+          y: margin + 30,
+          size: 12
         });
 
         const pdfBytes = await pdfDoc.save();
 
-        // 🔁 Wyślij do backendu Render
-        const backendUrl = "https://login-app-mxrqrb0ylr.onrender.com/upload"; // ⬅️ Uzupełnij adresem z Render
+        const backendUrl = "https://login-app-mxrqrb0ylr.onrender.com/upload";
         const response = await fetch(backendUrl, {
           method: "POST",
           headers: {
@@ -104,6 +138,8 @@
 
         if (response.ok) {
           status.textContent = "✅ Podpisany dokument został wysłany!";
+          signaturePad.clear();
+          document.getElementById("fullName").value = "";
         } else {
           throw new Error("Nie udało się wysłać pliku.");
         }
